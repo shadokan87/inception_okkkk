@@ -1,0 +1,68 @@
+version: '3'
+services:
+  nginx:
+    build: nginx/
+    container_name: nginx
+    ports:
+      - 443:443
+    volumes:
+      - pages:/home/ftserver/public_html
+      - socket:/var/run/php
+      - db:/var/run/mysqld
+    networks:
+      - ftserver
+    restart: always
+
+  wordpress:
+    build: wordpress/
+    container_name: wordpress
+    volumes:
+      - pages:/home/ftserver/public_html
+      - socket:/var/run/php
+      - db:/var/run/mysqld
+    environment:
+        - DB_NAME
+        - DB_USER
+        - DB_PSWD
+    networks:
+      - ftserver
+    depends_on:
+        - mysql
+    restart: always
+
+  mysql:
+    build:
+      context: ./mysql
+    container_name: mysql
+    image: mysql
+    networks:
+      - ftserver
+    volumes:
+      - db:/var/run/mysqld
+    environment:
+        - DB_NAME
+        - DB_USER
+        - DB_PSWD
+    restart: always
+networks:
+  ftserver:
+
+volumes:
+  pages:
+    driver: local
+    driver_opts:
+      o: 'bind'
+      type: 'none'
+      device: '/home/motoure/data/pages'
+  db:
+    driver: local
+    driver_opts:
+      o: 'bind'
+      type: 'none'
+      device: '/home/motoure/data/db'
+  socket:
+    driver: local
+    driver_opts:
+      o: 'bind'
+      type: 'none'
+      device: '/home/motoure/data/socket'
