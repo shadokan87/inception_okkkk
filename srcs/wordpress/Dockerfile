@@ -7,7 +7,6 @@ RUN mv wp-cli.phar /usr/bin/wp && chmod 777 /usr/bin/wp ~/*.sh
 # -- configure php, install wordpress and phpmyadmin
 RUN bash ~/configure_php.sh
 RUN bash ~/install_wordpress.sh
-RUN bash ~/install_phpmyadmin.sh
 # --
 EXPOSE 9000
 ENTRYPOINT ~/init.sh

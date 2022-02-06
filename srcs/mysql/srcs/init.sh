@@ -5,11 +5,13 @@ service mysql start #will re-run if conainer crash
 # -- run mysql_secure dialog automated script via expect
 if [[ $(ls ~/mysql_secure.exp | wc -c) -ne 0 ]];
 then
-	sed -i "s/__DB_NAME__/${DB_NAME}/g" ~/mysql_script.sh
-	sed -i "s/__DB_PSWD__/${DB_PSWD}/g" ~/mysql_script.sh
-	sed -i "s/__DB_USER__/${DB_USER}/g" ~/mysql_script.sh
-	cat ~/mysql_secure.exp
+	sed -i "s/__DB_NAME__/${DB_NAME}/g" ~/mysql_secure.exp
+	sed -i "s/__DB_PSWD__/${DB_PSWD}/g" ~/mysql_secure.exp
+	sed -i "s/__DB_USER__/${DB_USER}/g" ~/mysql_secure.exp
+	cat ~/mysql_secure.exp #displaying final script (to check errors)
 	expect ~/mysql_secure.exp && rm -rf ~/mysql_secure.exp;
+else
+	bash ~/restoreroot.sh
 fi
 
 # -- Changing placeholder values in mysql_template.sh to .env values to get the final script(not using direct env expension to avoid syntax errors)
@@ -28,7 +30,10 @@ then
 	# -- delete template and script (one time run)
 	rm -rf ~/mysql_template.sh
 	rm -rf ~/mysql_script.sh
+	rm -rf ~/mysql_secure.exp
 fi
 service mysql stop
+bash ~/removeroot.sh &
 mv /var/lib/mysql/aria_log_control /root/
-mysqld --user=root
+mysqld
+
